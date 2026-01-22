@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/projectsFragment"
+        android:icon="@android:drawable/ic_menu_agenda"
+        android:title="Projects" />
+
+    <item
+        android:id="@+id/entriesFragment"
+        android:icon="@android:drawable/ic_menu_recent_history"
+        android:title="Entries" />
+
+    <item
+        android:id="@+id/stopwatchFragment"
+        android:icon="@android:drawable/ic_media_play"
+        android:title="Stopwatch" />
+
+    <item
+        android:id="@+id/timerFragment"
+        android:icon="@android:drawable/ic_lock_idle_alarm"
+        android:title="Timer" />
+
+</menu>

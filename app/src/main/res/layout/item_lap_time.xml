@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="12dp"
+        android:gravity="center_vertical">
+
+    <TextView
+            android:id="@+id/lapNumber"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Lap 1"
+            android:textSize="16sp"/>
+
+    <TextView
+            android:id="@+id/lapDuration"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="00:00.00"
+            android:textSize="16sp"
+            android:fontFamily="monospace"
+            android:textAlignment="center"/>
+
+    <TextView
+            android:id="@+id/totalTime"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="00:00.00"
+            android:textSize="16sp"
+            android:fontFamily="monospace"
+            android:textAlignment="viewEnd"/>
+
+</LinearLayout>
