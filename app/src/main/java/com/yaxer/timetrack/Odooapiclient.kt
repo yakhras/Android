@@ -434,4 +434,139 @@ object OdooApiClient {
             false
         }
     }
+
+    /**
+     * Create a new time entry (simplified version for repository)
+     * Returns: new entry ID if successful, null if failed
+     */
+    suspend fun createTimeEntry(
+        date: String,
+        projectId: Int,
+        startTime: String,
+        endTime: String,
+        durationMinutes: Int,
+        description: String
+    ): Int? = withContext(Dispatchers.IO) {
+        try {
+            val uid = userId ?: return@withContext null
+
+            val config = XmlRpcClientConfigImpl().apply {
+                serverURL = URL("${OdooConfig.SERVER_URL}/xmlrpc/2/object")
+            }
+            val client = XmlRpcClient()
+            client.setConfig(config)
+
+            val values = mutableMapOf<String, Any>(
+                "date" to date,
+                "project_id" to projectId,
+                "duration_minutes" to durationMinutes
+            )
+
+            if (startTime.isNotEmpty()) values["start_time"] = startTime
+            if (endTime.isNotEmpty()) values["end_time"] = endTime
+            if (description.isNotEmpty()) values["description"] = description
+
+            val result = client.execute(
+                "execute_kw",
+                listOf(
+                    OdooConfig.DATABASE,
+                    uid,
+                    OdooConfig.API_KEY,
+                    "timetrack.entry",
+                    "create",
+                    listOf(values)
+                )
+            ) as Int
+
+            result
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+
+    /**
+     * Update an existing time entry
+     * Returns: true if successful, false if failed
+     */
+    suspend fun updateTimeEntry(
+        id: Int,
+        date: String,
+        projectId: Int,
+        startTime: String,
+        endTime: String,
+        durationMinutes: Int,
+        description: String
+    ): Boolean = withContext(Dispatchers.IO) {
+        try {
+            val uid = userId ?: return@withContext false
+
+            val config = XmlRpcClientConfigImpl().apply {
+                serverURL = URL("${OdooConfig.SERVER_URL}/xmlrpc/2/object")
+            }
+            val client = XmlRpcClient()
+            client.setConfig(config)
+
+            val values = mutableMapOf<String, Any>(
+                "date" to date,
+                "project_id" to projectId,
+                "duration_minutes" to durationMinutes
+            )
+
+            if (startTime.isNotEmpty()) values["start_time"] = startTime
+            if (endTime.isNotEmpty()) values["end_time"] = endTime
+            if (description.isNotEmpty()) values["description"] = description
+
+            client.execute(
+                "execute_kw",
+                listOf(
+                    OdooConfig.DATABASE,
+                    uid,
+                    OdooConfig.API_KEY,
+                    "timetrack.entry",
+                    "write",
+                    listOf(
+                        listOf(id),
+                        values
+                    )
+                )
+            )
+            true
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
+        }
+    }
+
+    /**
+     * Delete a time entry
+     * Returns: true if successful, false if failed
+     */
+    suspend fun deleteTimeEntry(id: Int): Boolean = withContext(Dispatchers.IO) {
+        try {
+            val uid = userId ?: return@withContext false
+
+            val config = XmlRpcClientConfigImpl().apply {
+                serverURL = URL("${OdooConfig.SERVER_URL}/xmlrpc/2/object")
+            }
+            val client = XmlRpcClient()
+            client.setConfig(config)
+
+            client.execute(
+                "execute_kw",
+                listOf(
+                    OdooConfig.DATABASE,
+                    uid,
+                    OdooConfig.API_KEY,
+                    "timetrack.entry",
+                    "unlink",
+                    listOf(listOf(id))
+                )
+            )
+            true
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
+        }
+    }
 }

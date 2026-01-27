@@ -9,12 +9,13 @@ import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.yaxer.timetrack.data.local.TimeEntryEntity
 import java.time.Duration
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 class EntriesAdapter(
-    private val entries: List<Map<String, Any>>,
+    private val entries: List<TimeEntryEntity>,
     private val onStartTimer: (entryId: Int) -> Unit,
     private val onPauseTimer: (entryId: Int) -> Unit,
     private val onResumeTimer: (entryId: Int) -> Unit,
@@ -50,18 +51,13 @@ class EntriesAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val entry = entries[position]
-        val entryId = (entry["id"] as Number).toInt()
+        val entryId = entry.id
 
-        // Project name
-        val projectInfo = entry["project_id"]
-        val projectName = when (projectInfo) {
-            is Array<*> -> projectInfo.getOrNull(1)?.toString() ?: "Unknown"
-            else -> "Unknown"
-        }
-        holder.entryProject.text = projectName
+        // Project name - direct access from entity
+        holder.entryProject.text = entry.projectName
 
         // Check states
-        val isRunning = entry["is_running"] == true
+        val isRunning = entry.isRunning
         val isPaused = pausedEntries.containsKey(entryId)
 
         // Status badge
@@ -116,9 +112,9 @@ class EntriesAdapter(
                 onResumeTimer(entryId)
                 notifyItemChanged(position)
                 // Restart live timer
-                val startTime = entry["start_time"]
-                if (startTime != null && startTime != false) {
-                    startLiveTimer(holder, entryId, startTime.toString())
+                val startTime = entry.startTime
+                if (startTime != null) {
+                    startLiveTimer(holder, entryId, startTime)
                 }
             } else {
                 // Pause
@@ -145,31 +141,28 @@ class EntriesAdapter(
         }
 
         // Date
-        val date = entry["date"]?.toString() ?: "No date"
-        holder.entryDate.text = "Date: $date"
+        holder.entryDate.text = "Date: ${entry.date}"
 
         // Time
-        val startTime = entry["start_time"]
-        val endTime = entry["end_time"]
-        val startTimeStr = formatTime(startTime)
+        val startTimeStr = formatTime(entry.startTime)
         val endTimeStr = when {
             isPaused -> "Paused"
             isRunning -> "In progress"
-            else -> formatTime(endTime)
+            else -> formatTime(entry.endTime)
         }
         holder.entryTime.text = "Time: $startTimeStr - $endTimeStr"
 
         // Duration - live update for running entries
-        if (isRunning && !isPaused && startTime != null && startTime != false) {
-            startLiveTimer(holder, entryId, startTime.toString())
+        if (isRunning && !isPaused && entry.startTime != null) {
+            startLiveTimer(holder, entryId, entry.startTime)
         } else {
             stopLiveTimer(entryId)
-            val duration = entry["duration_minutes"] as? Int ?: 0
-            if (isPaused && startTime != null && startTime != false) {
+            val duration = entry.unitAmount.toInt()
+            if (isPaused && entry.startTime != null) {
                 // Show current duration minus paused time
                 val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
                 try {
-                    val start = LocalDateTime.parse(startTime.toString(), formatter)
+                    val start = LocalDateTime.parse(entry.startTime, formatter)
                     val pauseStart = pausedEntries[entryId] ?: LocalDateTime.now()
                     val totalSeconds = Duration.between(start, pauseStart).seconds - (totalPausedSeconds[entryId] ?: 0)
                     val minutes = (totalSeconds / 60).toInt()
@@ -183,10 +176,9 @@ class EntriesAdapter(
         }
 
         // Description
-        val description = entry["description"]?.toString()
-        if (!description.isNullOrEmpty() && description != "false") {
+        if (entry.description.isNotEmpty()) {
             holder.entryDescription.visibility = View.VISIBLE
-            holder.entryDescription.text = description
+            holder.entryDescription.text = entry.description
         } else {
             holder.entryDescription.visibility = View.GONE
         }
@@ -221,13 +213,12 @@ class EntriesAdapter(
         runningTimers.remove(entryId)
     }
 
-    private fun formatTime(time: Any?): String {
-        if (time == null || time == false) return "N/A"
-        val timeStr = time.toString()
-        return if (timeStr.contains(" ")) {
-            timeStr.split(" ").getOrNull(1)?.substring(0, 5) ?: timeStr
+    private fun formatTime(time: String?): String {
+        if (time == null) return "N/A"
+        return if (time.contains(" ")) {
+            time.split(" ").getOrNull(1)?.substring(0, 5) ?: time
         } else {
-            timeStr
+            time
         }
     }
 

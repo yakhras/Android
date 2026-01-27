@@ -4,12 +4,109 @@
     <shared>
       <config />
     </shared>
+    <layouts>
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/dialog_add_timer_entry.xml">
+        <config>
+          <theme>@style/Theme.Timetrack</theme>
+        </config>
+      </layout>
+    </layouts>
   </component>
   <component name="AutoImportSettings">
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e7b66ad8-4ddd-4424-b838-ba85943ee57c" name="Changes" comment="" />
+    <list default="true" id="e7b66ad8-4ddd-4424-b838-ba85943ee57c" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/yaxer/timetrack/TimeTrackApplication.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/yaxer/timetrack/data/local/Converters.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/yaxer/timetrack/data/local/Daos.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/yaxer/timetrack/data/local/TimeTrackDatabase.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/yaxer/timetrack/data/network/NetworkMonitor.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/yaxer/timetrack/data/repository/Mappers.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/yaxer/timetrack/data/repository/TimeTrackRepository.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/yaxer/timetrack/sync/SyncManager.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/yaxer/timetrack/sync/SyncPayloads.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/yaxer/timetrack/sync/SyncWorker.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/yaxer/timetrack/ui/ViewModelFactory.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/yaxer/timetrack/ui/entries/EntriesViewModel.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/yaxer/timetrack/ui/projects/ProjectsViewModel.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.claude/commands/speckit.analyze.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.claude/commands/speckit.checklist.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.claude/commands/speckit.clarify.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.claude/commands/speckit.constitution.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.claude/commands/speckit.implement.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.claude/commands/speckit.plan.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.claude/commands/speckit.specify.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.claude/commands/speckit.tasks.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.claude/commands/speckit.taskstoissues.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/8.13/checksums/checksums.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.13/checksums/checksums.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/8.13/checksums/md5-checksums.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.13/checksums/md5-checksums.bin" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/8.13/checksums/sha1-checksums.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.13/checksums/sha1-checksums.bin" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/8.13/executionHistory/executionHistory.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.13/executionHistory/executionHistory.bin" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/8.13/executionHistory/executionHistory.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.13/executionHistory/executionHistory.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/8.13/fileHashes/fileHashes.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.13/fileHashes/fileHashes.bin" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/8.13/fileHashes/fileHashes.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.13/fileHashes/fileHashes.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/8.13/fileHashes/resourceHashesCache.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.13/fileHashes/resourceHashesCache.bin" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/cache.properties" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/cache.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/outputFiles.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/outputFiles.bin" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.specify/memory/constitution.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.specify/scripts/powershell/check-prerequisites.ps1" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.specify/scripts/powershell/common.ps1" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.specify/scripts/powershell/create-new-feature.ps1" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.specify/scripts/powershell/setup-plan.ps1" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.specify/scripts/powershell/update-agent-context.ps1" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.specify/templates/agent-file-template.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.specify/templates/checklist-template.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.specify/templates/plan-template.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.specify/templates/spec-template.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.specify/templates/tasks-template.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CONSTITUTION.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/app/build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/androidTest/java/com/yaxer/timetrack/ExampleInstrumentedTest.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/yaxer/timetrack/EntriesActivity.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/yaxer/timetrack/EntriesAdapter.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/yaxer/timetrack/EntriesAdapter.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/yaxer/timetrack/EntriesFragment.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/yaxer/timetrack/EntriesFragment.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/yaxer/timetrack/MainActivity.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/yaxer/timetrack/OdooConfig.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/yaxer/timetrack/OdooConfig.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/yaxer/timetrack/Odooapiclient.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/yaxer/timetrack/Odooapiclient.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/yaxer/timetrack/ProjectsActivity.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/yaxer/timetrack/ProjectsAdapter.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/yaxer/timetrack/ProjectsAdapter.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/yaxer/timetrack/ProjectsFragment.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/yaxer/timetrack/ProjectsFragment.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/yaxer/timetrack/StopwatchActivity.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/yaxer/timetrack/TimerFragment.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/yaxer/timetrack/TimerFragment.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/activity_entries.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/activity_main.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/activity_projects.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/activity_stopwatch.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/test/java/com/yaxer/timetrack/ExampleUnitTest.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/reports/problems/problems-report.html" beforeDir="false" afterPath="$PROJECT_DIR$/build/reports/problems/problems-report.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gradle.properties" beforeDir="false" afterPath="$PROJECT_DIR$/gradle.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/settings.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/settings.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/specs/001-timer-add-time/checklists/requirements.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/specs/001-timer-add-time/plan.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/specs/001-timer-add-time/research.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/specs/001-timer-add-time/spec.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/specs/002-stopwatch-add-time/checklists/requirements.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/specs/002-stopwatch-add-time/contracts/stopwatch-add-time-service.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/specs/002-stopwatch-add-time/data-model.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/specs/002-stopwatch-add-time/plan.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/specs/002-stopwatch-add-time/quickstart.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/specs/002-stopwatch-add-time/research.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/specs/002-stopwatch-add-time/spec.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/specs/003-notification-counters/checklists/requirements.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/specs/003-notification-counters/contracts/notification-manager-interface.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/specs/003-notification-counters/data-model.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/specs/003-notification-counters/plan.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/specs/003-notification-counters/quickstart.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/specs/003-notification-counters/research.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/specs/003-notification-counters/spec.md" beforeDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -39,23 +136,15 @@
                 <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
                 <item name="timetrack" type="f1a62948:ProjectNode" />
               </path>
-              <path>
-                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
-                <item name="timetrack" type="f1a62948:ProjectNode" />
-                <item name="Tasks" type="e4a08cd1:TasksNode" />
-              </path>
-              <path>
-                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
-                <item name="timetrack" type="f1a62948:ProjectNode" />
-                <item name="Tasks" type="e4a08cd1:TasksNode" />
-                <item name="build setup" type="c8890929:TasksNode$1" />
-              </path>
             </expand>
             <select />
           </tree_state>
         </projects_view>
       </state>
     </system>
+  </component>
+  <component name="GenerateSignedApkSettings">
+    <option name="BUILD_TARGET_KEY" value="apk" />
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -75,6 +164,7 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "Android App.app.executor": "Run",
+    "ApkExportedModule": "timetrack.app",
     "Gradle.Android [init].executor": "Run",
     "Gradle.Android [updateDaemonJvm].executor": "Run",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
@@ -82,12 +172,12 @@
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "git-widget-placeholder": "001-timer-add-time",
+    "git-widget-placeholder": "main",
     "kotlin-language-version-configured": "true",
     "project.structure.last.edited": "Modules",
     "project.structure.proportion": "0.15",
     "project.structure.side.proportion": "0.2",
-    "settings.editor.selected.configurable": "com.github.copilot.settings.network.NetworkConfigurable"
+    "settings.editor.selected.configurable": "terminal"
   }
 }]]></component>
   <component name="RunManager">
@@ -138,7 +228,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-30f59d01ecdd-26cb7f24e5b0-intellij.indexing.shared.core-IU-253.29346.240" />
+        <option value="bundled-jdk-30f59d01ecdd-2fc7cc6b9a17-intellij.indexing.shared.core-IU-253.30387.90" />
       </set>
     </attachedChunks>
   </component>

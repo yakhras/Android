@@ -9,13 +9,21 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.yaxer.timetrack.ui.ViewModelFactory
+import com.yaxer.timetrack.ui.projects.ProjectsViewModel
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
 class ProjectsFragment : Fragment() {
+
+    private val viewModel: ProjectsViewModel by viewModels {
+        ViewModelFactory((requireActivity().application as TimeTrackApplication).repository)
+    }
 
     private lateinit var statusText: TextView
     private lateinit var recyclerView: RecyclerView
@@ -41,22 +49,32 @@ class ProjectsFragment : Fragment() {
             showCreateProjectDialog()
         }
 
-        loadProjects()
-    }
-
-    private fun loadProjects() {
-        statusText.text = "Loading projects..."
-
+        // Observe projects and loading state combined
         viewLifecycleOwner.lifecycleScope.launch {
-            val projects = OdooApiClient.fetchProjects()
-
-            if (projects.isEmpty()) {
-                statusText.text = "No projects found"
-            } else {
-                statusText.text = "${projects.size} projects"
-                recyclerView.adapter = ProjectsAdapter(projects)
+            combine(viewModel.projects, viewModel.isLoading) { projects, isLoading ->
+                Pair(projects, isLoading)
+            }.collect { (projects, isLoading) ->
+                statusText.text = when {
+                    isLoading -> "Loading..."
+                    projects.isEmpty() -> "No projects found"
+                    else -> "${projects.size} projects"
+                }
+                if (!isLoading && projects.isNotEmpty()) {
+                    recyclerView.adapter = ProjectsAdapter(projects)
+                }
             }
         }
+
+
+        // Observe errors
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.error.collect { error ->
+                Toast.makeText(requireContext(), error, Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        // Initial refresh
+        viewModel.refresh()
     }
 
     private fun showCreateProjectDialog() {
@@ -71,28 +89,12 @@ class ProjectsFragment : Fragment() {
             .setPositiveButton("Create") { _, _ ->
                 val name = editText.text.toString().trim()
                 if (name.isNotEmpty()) {
-                    createProject(name)
+                    viewModel.createProject(name)
                 } else {
                     Toast.makeText(requireContext(), "Please enter a name", Toast.LENGTH_SHORT).show()
                 }
             }
             .setNegativeButton("Cancel", null)
             .show()
-    }
-
-    private fun createProject(name: String) {
-        statusText.text = "Creating project..."
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            val projectId = OdooApiClient.createProject(name)
-
-            if (projectId != null) {
-                Toast.makeText(requireContext(), "Project created!", Toast.LENGTH_SHORT).show()
-                loadProjects()
-            } else {
-                Toast.makeText(requireContext(), "Failed to create project", Toast.LENGTH_SHORT).show()
-                statusText.text = "Error creating project"
-            }
-        }
     }
 }

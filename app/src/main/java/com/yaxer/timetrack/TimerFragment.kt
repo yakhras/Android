@@ -6,15 +6,23 @@ import android.os.SystemClock
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import android.widget.Button
+import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.NumberPicker
 import android.widget.ProgressBar
+import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
+import com.yaxer.timetrack.data.local.ProjectEntity
+import kotlinx.coroutines.launch
+import java.time.LocalDateTime
 
 class TimerFragment : Fragment() {
 
@@ -33,6 +41,7 @@ class TimerFragment : Fragment() {
 
     private val viewModel: TimerViewModel by viewModels()
 
+    private var projects: List<ProjectEntity> = emptyList()
     private var countDownTimer: CountDownTimer? = null
 
     override fun onCreateView(
@@ -83,6 +92,15 @@ class TimerFragment : Fragment() {
         retryButton.visibility = View.GONE
         timerCard.visibility = View.VISIBLE
         startButton.visibility = View.VISIBLE
+
+        // Fetch projects in background for when timer completes
+        viewLifecycleOwner.lifecycleScope.launch {
+            val app = requireActivity().application as TimeTrackApplication
+            // Try to refresh from API if online (background)
+            try { app.repository.refreshProjects() } catch (_: Exception) {}
+            // Always load from local cache
+            projects = app.repository.getProjectsSync()
+        }
 
         // Restore state from ViewModel
         if (viewModel.timerState != TimerState.IDLE) {
@@ -149,6 +167,10 @@ class TimerFragment : Fragment() {
 
     private fun stopTimer() {
         countDownTimer?.cancel()
+        val elapsedMinutes = ((viewModel.totalMillis - viewModel.remainingMillis) / 60_000).toInt()
+        if (elapsedMinutes > 0) {
+            showAddEntryDialog(elapsedMinutes)
+        }
         resetTimer()
     }
 
@@ -214,7 +236,123 @@ class TimerFragment : Fragment() {
     }
 
     private fun onTimerComplete() {
+        val durationMinutes = (viewModel.totalMillis / 60_000).toInt()
         Toast.makeText(requireContext(), "Timer complete!", Toast.LENGTH_LONG).show()
+        showAddEntryDialog(durationMinutes)
         resetTimer()
+    }
+
+    private fun showAddEntryDialog(durationMinutes: Int) {
+        if (projects.isEmpty()) {
+            showNoProjectsDialog(durationMinutes)
+            return
+        }
+
+        val dialogView = layoutInflater.inflate(R.layout.dialog_add_timer_entry, null)
+        val durationText = dialogView.findViewById<TextView>(R.id.durationText)
+        val projectSpinner = dialogView.findViewById<Spinner>(R.id.projectSpinner)
+        val descriptionEditText = dialogView.findViewById<EditText>(R.id.descriptionEditText)
+
+        // Format duration display
+        val hours = durationMinutes / 60
+        val mins = durationMinutes % 60
+        durationText.text = if (hours > 0) {
+            String.format("Duration: %d hr %d min", hours, mins)
+        } else {
+            String.format("Duration: %d min", mins)
+        }
+
+        // Setup project spinner
+        val projectNames = projects.map { it.name }
+        val spinnerAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, projectNames)
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        projectSpinner.adapter = spinnerAdapter
+
+        AlertDialog.Builder(requireContext())
+            .setTitle("Add Time Entry")
+            .setView(dialogView)
+            .setPositiveButton("Add Entry") { _, _ ->
+                val selectedIndex = projectSpinner.selectedItemPosition
+                val projectId = projects[selectedIndex].id
+                val description = descriptionEditText.text.toString().trim()
+
+                createTimerEntry(projectId, durationMinutes, description.ifEmpty { null })
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    private fun createTimerEntry(projectId: Int, durationMinutes: Int, description: String?) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            val app = requireActivity().application as TimeTrackApplication
+            val endTime = LocalDateTime.now()
+            val startTime = endTime.minusMinutes(durationMinutes.toLong())
+
+            val entryId = app.repository.createTimeEntryWithTime(
+                projectId = projectId,
+                startTime = startTime,
+                endTime = endTime,
+                durationMinutes = durationMinutes,
+                description = description
+            )
+
+            if (entryId != null) {
+                val syncStatus = if (entryId < 0) " (will sync when online)" else ""
+                Toast.makeText(requireContext(), "Time entry created!$syncStatus", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(requireContext(), "Failed to create entry", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun showNoProjectsDialog(durationMinutes: Int) {
+        val editText = EditText(requireContext()).apply {
+            hint = "Project name"
+            setPadding(48, 32, 48, 32)
+        }
+
+        AlertDialog.Builder(requireContext())
+            .setTitle("No Projects Available")
+            .setMessage("Create a project to save your time entry (${formatDuration(durationMinutes)}):")
+            .setView(editText)
+            .setPositiveButton("Create & Save") { _, _ ->
+                val name = editText.text.toString().trim()
+                if (name.isNotEmpty()) {
+                    createProjectAndEntry(name, durationMinutes)
+                } else {
+                    Toast.makeText(requireContext(), "Please enter a project name", Toast.LENGTH_SHORT).show()
+                }
+            }
+            .setNegativeButton("Discard Time", null)
+            .show()
+    }
+
+    private fun createProjectAndEntry(projectName: String, durationMinutes: Int) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            val app = requireActivity().application as TimeTrackApplication
+            val projectId = app.repository.createProject(projectName)
+            if (projectId != null) {
+                val syncStatus = if (projectId < 0) " (will sync when online)" else ""
+                Toast.makeText(requireContext(), "Project created!$syncStatus", Toast.LENGTH_SHORT).show()
+
+                // Refresh local cache
+                projects = app.repository.getProjectsSync()
+
+                // Create the time entry
+                createTimerEntry(projectId, durationMinutes, null)
+            } else {
+                Toast.makeText(requireContext(), "Failed to create project", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun formatDuration(durationMinutes: Int): String {
+        val hours = durationMinutes / 60
+        val mins = durationMinutes % 60
+        return if (hours > 0) {
+            String.format("%d hr %d min", hours, mins)
+        } else {
+            String.format("%d min", mins)
+        }
     }
 }

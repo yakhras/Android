@@ -11,19 +11,28 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.yaxer.timetrack.data.local.ProjectEntity
+import com.yaxer.timetrack.ui.ViewModelFactory
+import com.yaxer.timetrack.ui.entries.EntriesViewModel
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
 class EntriesFragment : Fragment() {
+
+    private val viewModel: EntriesViewModel by viewModels {
+        ViewModelFactory((requireActivity().application as TimeTrackApplication).repository)
+    }
 
     private lateinit var statusText: TextView
     private lateinit var recyclerView: RecyclerView
     private lateinit var fabAddEntry: FloatingActionButton
 
-    private var projects: List<Map<String, Any>> = emptyList()
+    private var projectEntities: List<ProjectEntity> = emptyList()
     private var adapter: EntriesAdapter? = null
 
     override fun onCreateView(
@@ -46,7 +55,52 @@ class EntriesFragment : Fragment() {
             showCreateEntryDialog()
         }
 
-        loadData()
+        // Observe entries and loading state combined
+        viewLifecycleOwner.lifecycleScope.launch {
+            combine(viewModel.entries, viewModel.isLoading) { entries, isLoading ->
+                Pair(entries, isLoading)
+            }.collect { (entries, isLoading) ->
+                statusText.text = when {
+                    isLoading -> "Loading..."
+                    entries.isEmpty() -> "No time entries found"
+                    else -> "${entries.size} entries"
+                }
+                if (!isLoading) {
+                    if (entries.isEmpty()) {
+                        adapter?.cleanup()
+                        adapter = null
+                        recyclerView.adapter = null
+                    } else {
+                        adapter?.cleanup()
+                        adapter = EntriesAdapter(
+                            entries = entries,
+                            onStartTimer = { entryId -> handleStartTimer(entryId) },
+                            onPauseTimer = { entryId -> handlePauseTimer(entryId) },
+                            onResumeTimer = { entryId -> handleResumeTimer(entryId) },
+                            onStopTimer = { entryId, pausedSeconds -> handleStopTimer(entryId, pausedSeconds) }
+                        )
+                        recyclerView.adapter = adapter
+                    }
+                }
+            }
+        }
+
+        // Observe projects for create dialog
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.projects.collect { projects ->
+                projectEntities = projects
+            }
+        }
+
+        // Observe errors
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.error.collect { error ->
+                Toast.makeText(requireContext(), error, Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        // Initial refresh
+        viewModel.refresh()
     }
 
     override fun onDestroyView() {
@@ -54,47 +108,14 @@ class EntriesFragment : Fragment() {
         adapter?.cleanup()
     }
 
-    private fun loadData() {
-        statusText.text = "Loading..."
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            projects = OdooApiClient.fetchProjects()
-            loadEntries()
-        }
-    }
-
-    private fun loadEntries() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            val entries = OdooApiClient.fetchTimeEntries()
-
-            if (entries.isEmpty()) {
-                statusText.text = "No time entries found"
-                adapter?.cleanup()
-                adapter = null
-                recyclerView.adapter = null
-            } else {
-                statusText.text = "${entries.size} entries"
-                adapter?.cleanup()
-                adapter = EntriesAdapter(
-                    entries = entries,
-                    onStartTimer = { entryId -> handleStartTimer(entryId) },
-                    onPauseTimer = { entryId -> handlePauseTimer(entryId) },
-                    onResumeTimer = { entryId -> handleResumeTimer(entryId) },
-                    onStopTimer = { entryId, pausedSeconds -> handleStopTimer(entryId, pausedSeconds) }
-                )
-                recyclerView.adapter = adapter
-            }
-        }
-    }
-
     private fun handleStartTimer(entryId: Int) {
         viewLifecycleOwner.lifecycleScope.launch {
             statusText.text = "Starting timer..."
-            val success = OdooApiClient.startTimer(entryId)
+            val success = viewModel.startTimer(entryId)
 
             if (success) {
                 Toast.makeText(requireContext(), "Timer started!", Toast.LENGTH_SHORT).show()
-                loadEntries()
+                viewModel.refreshTodayOnly()
             } else {
                 Toast.makeText(requireContext(), "Failed to start timer", Toast.LENGTH_SHORT).show()
                 statusText.text = "Error"
@@ -104,7 +125,6 @@ class EntriesFragment : Fragment() {
 
     private fun handlePauseTimer(entryId: Int) {
         // Pause is handled locally in the adapter
-        // Just update the status text
         statusText.text = "Timer paused"
     }
 
@@ -116,11 +136,11 @@ class EntriesFragment : Fragment() {
     private fun handleStopTimer(entryId: Int, pausedSeconds: Long) {
         viewLifecycleOwner.lifecycleScope.launch {
             statusText.text = "Stopping timer..."
-            val success = OdooApiClient.stopTimerWithPause(entryId, pausedSeconds)
+            val success = viewModel.stopTimer(entryId, pausedSeconds)
 
             if (success) {
                 Toast.makeText(requireContext(), "Timer stopped!", Toast.LENGTH_SHORT).show()
-                loadEntries()
+                viewModel.refreshTodayOnly()
             } else {
                 Toast.makeText(requireContext(), "Failed to stop timer", Toast.LENGTH_SHORT).show()
                 statusText.text = "Error"
@@ -129,7 +149,7 @@ class EntriesFragment : Fragment() {
     }
 
     private fun showCreateEntryDialog() {
-        if (projects.isEmpty()) {
+        if (projectEntities.isEmpty()) {
             Toast.makeText(requireContext(), "No projects available. Create a project first.", Toast.LENGTH_SHORT).show()
             return
         }
@@ -138,7 +158,7 @@ class EntriesFragment : Fragment() {
         val projectSpinner = dialogView.findViewById<Spinner>(R.id.projectSpinner)
         val descriptionEditText = dialogView.findViewById<EditText>(R.id.descriptionEditText)
 
-        val projectNames = projects.map { it["name"]?.toString() ?: "Unknown" }
+        val projectNames = projectEntities.map { it.name }
         val spinnerAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, projectNames)
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         projectSpinner.adapter = spinnerAdapter
@@ -148,28 +168,12 @@ class EntriesFragment : Fragment() {
             .setView(dialogView)
             .setPositiveButton("Create") { _, _ ->
                 val selectedIndex = projectSpinner.selectedItemPosition
-                val projectId = (projects[selectedIndex]["id"] as Number).toInt()
+                val projectId = projectEntities[selectedIndex].id
                 val description = descriptionEditText.text.toString().trim()
 
-                createEntry(projectId, description.ifEmpty { null })
+                viewModel.createEntry(projectId, description.ifEmpty { null })
             }
             .setNegativeButton("Cancel", null)
             .show()
-    }
-
-    private fun createEntry(projectId: Int, description: String?) {
-        statusText.text = "Creating entry..."
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            val entryId = OdooApiClient.createEntry(projectId, description)
-
-            if (entryId != null) {
-                Toast.makeText(requireContext(), "Entry created!", Toast.LENGTH_SHORT).show()
-                loadEntries()
-            } else {
-                Toast.makeText(requireContext(), "Failed to create entry", Toast.LENGTH_SHORT).show()
-                statusText.text = "Error creating entry"
-            }
-        }
     }
 }

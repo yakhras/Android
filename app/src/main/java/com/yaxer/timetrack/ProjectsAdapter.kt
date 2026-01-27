@@ -5,9 +5,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.yaxer.timetrack.data.local.ProjectEntity
 
 class ProjectsAdapter(
-    private val projects: List<Map<String, Any>>
+    private val projects: List<ProjectEntity>
 ) : RecyclerView.Adapter<ProjectsAdapter.ViewHolder>() {
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -23,11 +24,8 @@ class ProjectsAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val project = projects[position]
-        val id = project["id"]
-        val name = project["name"]?.toString() ?: "Unknown"
-
-        holder.projectName.text = name
-        holder.projectId.text = "ID: $id"
+        holder.projectName.text = project.name
+        holder.projectId.text = "ID: ${project.id}"
     }
 
     override fun getItemCount() = projects.size

@@ -1,12 +1,6 @@
 pluginManagement {
   repositories {
-    google {
-      content {
-        includeGroupByRegex("com\\.android.*")
-        includeGroupByRegex("com\\.google.*")
-        includeGroupByRegex("androidx.*")
-      }
-    }
+    google()
     mavenCentral()
     gradlePluginPortal()
   }
@@ -17,8 +11,16 @@ plugins {
 dependencyResolutionManagement {
   repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
   repositories {
-    google()
-    mavenCentral()
+    google {
+      url = uri("https://dl.google.com/dl/android/maven2/")
+    }
+    mavenCentral {
+      url = uri("https://repo1.maven.org/maven2/")
+    }
+    // Add JCenter as fallback (though deprecated, some dependencies might still need it)
+    maven {
+      url = uri("https://jcenter.bintray.com/")
+    }
   }
 }
 
